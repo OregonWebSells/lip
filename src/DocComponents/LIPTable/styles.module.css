@@ -34,16 +34,16 @@
   width: 55%;
 }
 
-.table thead th {
+html:not[data-theme="dark"].table thead th {
   background-color: #E3E8EE;
   color: #737D8F;
 }
 
-.table tbody {
+html:not[data-theme="dark"].table tbody {
   color: black;
 }
 
-.table tbody:nth(odd) {
+html:not[data-theme="dark"].table tbody:nth(odd) {
   background-color: #F7FAFC;
 }
 
