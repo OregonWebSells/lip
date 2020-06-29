@@ -9,8 +9,20 @@ module.exports = function(context, options) {
         resolve: {
           alias: {
             CSS: path.resolve(__dirname, '../../../src/css'),
+            components: path.resolve(__dirname, '../../../src/components'),
+            react: path.resolve('./node_modules/react'),
+            img: path.resolve(__dirname, '../../../static/img'),
+            moduleImg: path.resolve(__dirname, './node_modules/libra-docusaurus/img'),
           }
-        }
+        },
+        module: {
+          rules: [
+            {
+              test: /\.svg$/,
+              use: ['@svgr/webpack'],
+            },
+          ],
+        },
       };
     },
   };

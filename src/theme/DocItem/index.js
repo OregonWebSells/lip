@@ -1,6 +1,8 @@
 import React, {useEffect} from 'react';
+import {RightSidebar} from 'libra-docusaurus-components';
 
 import Head from '@docusaurus/Head';
+import Heading from '@theme/Heading';
 import isInternalUrl from '@docusaurus/isInternalUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -11,42 +13,8 @@ import {scrollToTop, toTitleCase} from '../../utils';
 import classnames from 'classnames';
 import styles from './styles.module.css';
 
-const LINK_CLASS_NAME = 'contents__link';
-const ACTIVE_LINK_CLASS_NAME = 'contents__link--active';
-const TOP_OFFSET = 100;
 const HEADER_ID = 'header';
 const METADATA_TABLE_ID = 'metadata-table';
-
-function DocTOC({headings}) {
-  return (
-    <div className="col col--3">
-      <div className={styles.tableOfContents}>
-        <Headings headings={headings} />
-      </div>
-    </div>
-  );
-}
-
-/* eslint-disable jsx-a11y/control-has-associated-label */
-function Headings({headings, isChild}) {
-  if (!headings.length) {
-    return null;
-  }
-  return (
-    <ul className={isChild ? '' : 'contents contents__left-border'}>
-      {headings.map(heading => (
-        <li className={styles.tocLink} key={heading.id}>
-          <a
-            href={`#${heading.id}`}
-            className={LINK_CLASS_NAME}
-            dangerouslySetInnerHTML={{__html: heading.value}}
-          />
-          <Headings isChild headings={heading.children} />
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 const MetadataTable = ({rows}) => (
   <table className={styles.metadataTable}>
@@ -121,12 +89,17 @@ function DocItem(props) {
       lip,
       status,
       title_toc_label: titleTOCLabel,
+      title: frontMatterTitle,
       type,
     },
   } = DocContent;
 
   const displayLipTable = lip !== undefined;
-  const headings = getHeadings(DocContent.rightToc, titleTOCLabel, displayLipTable);
+  const headings = getHeadings(
+    DocContent.rightToc, 
+    titleTOCLabel || title, 
+    displayLipTable,
+  );
 
   const metaTitle = title ? `${title} | ${siteTitle}` : siteTitle;
   let metaImageUrl = siteUrl + useBaseUrl(metaImage);
@@ -137,6 +110,8 @@ function DocItem(props) {
   const githubEditURL = getEditUrl(editUrl, lip !== undefined);
 
   useEffect(scrollToTop, []);
+
+  const Title = Heading('h2');
 
   return (
     <>
@@ -157,108 +132,60 @@ function DocItem(props) {
         )}
         {permalink && <meta property="og:url" content={siteUrl + permalink} />}
       </Head>
-      <div>
-        <div className="container">
-          <div className="row">
-            <div className={classnames('col', styles.docItemCol)}>
-              <div className={styles.docItemContainer}>
-                <article>
-                  {version && (
-                    <div>
-                      <span className="badge badge--secondary">
-                        Version: {version}
-                      </span>
-                    </div>
-                  )}
-                  <header className={styles.header} id={HEADER_ID}>
-                    {!hideTitle && (
-                      <h2 className={styles.docTitle}>{title}</h2>
-                    )}
-                    {githubEditURL && (
-                      <a 
-                        className={styles.editButton}
-                        href={githubEditURL}
-                        target="_blank"
-                      >
-                        EDIT
-                      </a>
-                    )}
-                  </header>
-                  {displayLipTable &&
-                    <div id={METADATA_TABLE_ID}>
-                      <MetadataTable 
-                        rows={[
-                          ["LIP", lip],
-                          ["Title", title],
-                          ["Author", `@${author}`, `https://github.com/${author}`],
-                          ["Discussions-to", discussionsTo, discussionsTo],
-                          ["Status", toTitleCase(status)],
-                          ["Type", toTitleCase(type)],
-                          ["Created", created],
-                        ]}
-                      />
-                    </div>
-                  }
-                  <div className="markdown">
-                    <DocContent />
-                  </div>
-                </article>
-                {(githubEditURL || lastUpdatedAt || lastUpdatedBy) && (
-                  <div className="margin-vert--xl">
-                    <div className={styles.copyright}>
-                      Copyright Notice: This documentation is made available 
-                      under the Creative Commons Attribution 4.0 International 
-                      (CC BY 4.0) license (available at 
-                        <a href="https://creativecommons.org/licenses/by/4.0/" target="blank"> https://creativecommons.org/licenses/by/4.0/</a>).
-                    </div>
-                    <div className="row">
-                      {(lastUpdatedAt || lastUpdatedBy) && (
-                        <div className="col text--right">
-                          <em>
-                            <small>
-                              Last updated{' '}
-                              {lastUpdatedAt && (
-                                <>
-                                  on{' '}
-                                  <time
-                                    dateTime={new Date(
-                                      lastUpdatedAt * 1000,
-                                    ).toISOString()}
-                                    className={styles.docLastUpdatedAt}>
-                                    {new Date(
-                                      lastUpdatedAt * 1000,
-                                    ).toLocaleDateString()}
-                                  </time>
-                                  {lastUpdatedBy && ' '}
-                                </>
-                              )}
-                              {lastUpdatedBy && (
-                                <>
-                                  by <strong>{lastUpdatedBy}</strong>
-                                </>
-                              )}
-                              {process.env.NODE_ENV === 'development' && (
-                                <div>
-                                  <small>
-                                    {' '}
-                                    (Simulated during dev for better perf)
-                                  </small>
-                                </div>
-                              )}
-                            </small>
-                          </em>
-                        </div>
-                      )}
-                    </div>
+      <div
+        className={classnames(
+          'container',
+          styles.docItemWrapper,
+        )}
+      >
+        <div className={classnames(styles.docItemCol)}>
+          <div className={styles.docItemContainer}>
+            <article>
+                {version && (
+                  <div>
+                    <span className="badge badge--secondary">
+                      Version: {version}
+                    </span>
                   </div>
                 )}
-              </div>
-            </div>
-            {!hideTableOfContents && DocContent.rightToc && (
-              <DocTOC headings={headings} />
-            )}
+                <header className={styles.header} id={HEADER_ID}>
+                  {!hideTitle && (
+                    <Title className={styles.docTitle} id={title}>{title}</Title>
+                  )}
+                </header>
+                {displayLipTable &&
+                  <div id={METADATA_TABLE_ID}>
+                    <MetadataTable 
+                      rows={[
+                        ["LIP", lip],
+                        ["Title", title],
+                        ["Author", `@${author}`, `https://github.com/${author}`],
+                        ["Discussions-to", discussionsTo, discussionsTo],
+                        ["Status", toTitleCase(status)],
+                        ["Type", toTitleCase(type)],
+                        ["Created", created],
+                      ]}
+                    />
+                  </div>
+                }
+                <div className="markdown">
+                  <DocContent />
+                </div>
+                <div className="margin-bottom--lg margin-top--xl">
+                  <div className={styles.copyright}>
+                    Copyright Notice: This documentation is made available 
+                    under the Creative Commons Attribution 4.0 International 
+                    (CC BY 4.0) license (available at 
+                      <a href="https://creativecommons.org/licenses/by/4.0/" target="blank"> https://creativecommons.org/licenses/by/4.0/</a>).
+                  </div>
+                </div>
+            </article>
           </div>
         </div>
+        <RightSidebar
+          editUrl={githubEditURL}
+          headings={headings} 
+        />
       </div>
     </>
   );

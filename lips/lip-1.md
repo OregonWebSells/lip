@@ -305,7 +305,11 @@ A `KYCDataObject` represents the KYC data for a single subaddress.  Proof of non
 | dob | str | N | Date of birth for the holder of this account.  Specified as an ISO 8601 calendar date format: https://en.wikipedia.org/wiki/ISO_8601 |
 | place_of_birth | [AddressObject](#addressobject) | N | Place of birth for this user.  line1 and line2 fields should not be populated for this usage of the address object |
 | national_id | [NationalIdObject](#nationalidobject) | N | National ID information for the holder of this account |
+<<<<<<< HEAD
 | legal_entity_name | str | N | Name of the legal entity.  Used when subaddress represents a legal entity rather than an individual. KYCDataObject should only include one of legal_entity_name OR given_name/surname
+=======
+| legal_entity_name | str | N | Name of the legal entity 
+>>>>>>> correct-head
 
 ```
 {

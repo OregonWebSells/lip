@@ -18,8 +18,3 @@
     display: inherit;
   }
 }
-
-/* Custom */
-.docPage > div {
-  border-right: none;
-}
